@@ -1,3 +1,15 @@
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Container,
+  FormControl,
+  Grid,
+  makeStyles,
+  MenuItem,
+  Select,
+  Typography
+} from '@material-ui/core'
 import React from 'react'
 
 const questionId = ['ep1', 'ep2', 'ep3', 'ep4'] as const
@@ -7,23 +19,29 @@ interface Question {
   right: string
   options: string[]
 }
+
+const TITLE: { [K in QuestionId]: string } = {
+  ep1: 'ファントム・メナス',
+  ep2: 'クローン戦争',
+  ep3: 'シスの復讐',
+  ep4: '新たなる希望'
+}
+
 const questions: { [K in QuestionId]: Question } = {
   ep1: {
-    text:
-      'ファントム・メナス：タトゥイーンのポッドレースでアナキンのライバルであったレーサーの名前は？',
+    text: 'タトゥイーンのポッドレースでアナキンのライバルであったレーサーの名前は？',
     right: 'セブルバ',
-    options: ['', 'ワトー', 'ダース・モール', 'セブルバ', 'ヌート・ガンレイ']
+    options: ['ワトー', 'ダース・モール', 'セブルバ', 'ヌート・ガンレイ']
   },
   ep2: {
-    text: 'クローン戦争：クローン戦争が勃発した惑星の名前は？',
+    text: 'クローン戦争が勃発した惑星の名前は？',
     right: 'ジオノーシス',
-    options: ['', 'ジオノーシス', 'ヤヴィン', 'エンドア', 'スカリフ']
+    options: ['ジオノーシス', 'ヤヴィン', 'エンドア', 'スカリフ']
   },
   ep3: {
-    text: 'シスの復讐：アナキンが共和国を裏切って最初に倒したジェダイは？',
+    text: 'アナキンが共和国を裏切って最初に倒したジェダイは？',
     right: 'メイス・ウィンドゥ',
     options: [
-      '',
       'キ＝アディ＝ムンディ',
       'アイラ・セキュラ',
       'クワイ＝ガン・ジン',
@@ -31,9 +49,9 @@ const questions: { [K in QuestionId]: Question } = {
     ]
   },
   ep4: {
-    text: 'ジェダイの帰還：ヤヴィンの戦いの生還者は次のうち誰？',
+    text: 'ヤヴィンの戦いの生還者は次のうち誰？',
     right: 'ウェッジ・アンティリーズ',
-    options: ['', 'ビッグス・ダークライター', 'ウェッジ・アンティリーズ', 'ジェック・ポーキンス']
+    options: ['ビッグス・ダークライター', 'ウェッジ・アンティリーズ', 'ジェック・ポーキンス']
   }
 }
 
@@ -47,8 +65,16 @@ interface QuestionProp {
 }
 
 const Question = (props: QuestionProp) => {
+  const useStyles = makeStyles((theme) => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120
+    }
+  }))
+  const classes = useStyles()
+
   const renderOptions = (options: string[]) => {
-    return options.map((v) => <option value={v}>{v}</option>)
+    return options.map((v) => <MenuItem value={v}>{v}</MenuItem>)
   }
   const renderResult = () => {
     if (props.result !== undefined) {
@@ -61,22 +87,24 @@ const Question = (props: QuestionProp) => {
   }
 
   return (
-    <div>
-      <h2>
-        【Q{props.index + 1}】{props.id}: {props.question.text}
-      </h2>
-      <div>
-        <form>
-          <label>
-            回答：
-            <select value={props.answer} onChange={handleChange}>
+    <Grid key={props.index} item xs={12} sm={6} md={3}>
+      <Card>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            【Q{props.index + 1}】{props.id} {TITLE[props.id]}
+          </Typography>
+          <Typography>{props.question.text}</Typography>
+        </CardContent>
+        <CardActions>
+          <FormControl className={classes.formControl}>
+            <Select value={props.answer} onChange={handleChange} displayEmpty>
               {renderOptions(props.question.options)}
-            </select>
-            {renderResult()}
-          </label>
-        </form>
-      </div>
-    </div>
+            </Select>
+          </FormControl>
+          <Typography>{renderResult()}</Typography>
+        </CardActions>
+      </Card>
+    </Grid>
   )
 }
 
@@ -104,12 +132,16 @@ export default function Quiz() {
 
   return (
     <div className="Quiz">
-      <h1>スターウォーズのクイズ</h1>
-      <p>
-        {Object.keys(questions).length}問中 {Object.entries(resultState).filter(Boolean).length}
-        問正解
-      </p>
-      {questionItems}
+      <Container>
+        <h1>スターウォーズのクイズ</h1>
+        <p>
+          {Object.keys(questions).length}問中 {Object.entries(resultState).filter(Boolean).length}
+          問正解
+        </p>
+        <Grid container spacing={4}>
+          {questionItems}
+        </Grid>
+      </Container>
     </div>
   )
 }
